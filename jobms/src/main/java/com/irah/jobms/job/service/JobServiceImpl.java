@@ -85,6 +85,7 @@ public class JobServiceImpl implements JobService {
 
     public JobDto convertToJobWithCompanyDto(Job job) {
 
+        //RestTemplate with Eureaka Services
         JobDto jobDto = new JobDto();
         jobDto = mapToJobDto(job);
         Company company = restTemplate.getForObject("http://COMPANY-SERVICE:8081/companies/" + job.getCompanyId(),
