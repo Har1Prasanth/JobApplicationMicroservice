@@ -1,5 +1,7 @@
 package com.irah.jobms.job.service;
 
+import com.irah.jobms.job.clients.CompanyClient;
+import com.irah.jobms.job.clients.ReviewClient;
 import com.irah.jobms.job.entity.Job;
 import com.irah.jobms.job.external.Company;
 import com.irah.jobms.job.external.Review;
@@ -7,15 +9,8 @@ import com.irah.jobms.job.mapper.JobMapper;
 import com.irah.jobms.job.model.JobDto;
 import com.irah.jobms.job.repository.JobRepo;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +22,8 @@ import static com.irah.jobms.job.mapper.JobMapper.mapToJobDto;
 public class JobServiceImpl implements JobService {
 
     private JobRepo jobRepository;
-    private RestTemplate restTemplate;
+    private CompanyClient companyClient;
+    private ReviewClient reviewClient;
 
 
     @Override
@@ -85,20 +81,15 @@ public class JobServiceImpl implements JobService {
 
     public JobDto convertToJobWithCompanyDto(Job job) {
 
-        //RestTemplate with Eureaka Services
         JobDto jobDto = new JobDto();
         jobDto = mapToJobDto(job);
-        Company company = restTemplate.getForObject("http://COMPANY-SERVICE:8081/companies/" + job.getCompanyId(),
-                Company.class);
 
+        // OpenFeign calls for Company Service
+        Company company=companyClient.getCompany(job.getCompanyId());
 
-        ResponseEntity<List<Review>> reviewResponse= restTemplate.exchange("http://REVIEW-SERVICE:8082/reviews?companyId=" + job.getCompanyId(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Review>>() {
-                });
+        // OpenFeign calls for Review Service
+        List<Review> reviews=reviewClient.getReviews(job.getCompanyId());
 
-        List<Review> reviews= reviewResponse.getBody();
         jobDto.setCompany(company);
         jobDto.setReviews(reviews);
         return jobDto;
