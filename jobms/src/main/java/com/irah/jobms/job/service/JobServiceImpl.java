@@ -8,6 +8,7 @@ import com.irah.jobms.job.external.Review;
 import com.irah.jobms.job.mapper.JobMapper;
 import com.irah.jobms.job.model.JobDto;
 import com.irah.jobms.job.repository.JobRepo;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,9 @@ public class JobServiceImpl implements JobService {
     private ReviewClient reviewClient;
 
 
+    //Similarly @RateLimiter and @Retry can be achieved
     @Override
+    @CircuitBreaker(name = "companyBreaker")
     public List<JobDto> findAllJobs() {
         List<Job> jobs = jobRepository.findAll();
 
