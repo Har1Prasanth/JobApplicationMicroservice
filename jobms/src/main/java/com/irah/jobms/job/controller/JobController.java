@@ -2,7 +2,6 @@ package com.irah.jobms.job.controller;
 
 import com.irah.jobms.job.model.JobDto;
 import com.irah.jobms.job.service.JobService;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +11,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/jobs")
-@AllArgsConstructor
 public class JobController {
 
     private JobService jobService;
 
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
+    }
 
 
     //Get All jobs
