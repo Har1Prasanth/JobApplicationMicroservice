@@ -11,4 +11,5 @@ public interface CompanyClient {
     @GetMapping("/companies/{id}")
     Company getCompany(@PathVariable("id") Long companyId);
 
+
 }
